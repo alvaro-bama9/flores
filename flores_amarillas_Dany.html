@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flores amarillas para Dany</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#FFD700;--bg1:#0b132b;--bg2:#1c2541;--bg3:#3a506b}
+*{box-sizing:border-box}
+body{margin:0;height:100vh;overflow:hidden;color:#fff;text-align:center;font-family:'Poppins',sans-serif;background:linear-gradient(270deg,var(--bg1),var(--bg2),var(--bg3));background-size:600% 600%;animation:bgShift 15s ease infinite}
+@keyframes bgShift{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+.star{position:fixed;background:#fff;border-radius:50%;opacity:.6;pointer-events:none;animation:twinkle 2s infinite alternate}
+@keyframes twinkle{from{opacity:.3;transform:scale(.8)}to{opacity:1;transform:scale(1.2)}}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;transition:opacity .8s ease,transform .8s ease}
+.hide{opacity:0;pointer-events:none;transform:translateY(20px)}
+.show{opacity:1;transform:translateY(0)}
+.greetings span{display:block;font-size:clamp(42px,8vw,90px);font-weight:700;color:var(--gold);font-family:'Pacifico',cursive;text-shadow:0 0 10px rgba(255,215,0,.5),0 0 25px rgba(255,215,0,.5)}
+.cursor{display:inline-block;width:3px;height:.9em;background:var(--gold);margin-left:6px;animation:blink .7s infinite}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.description{margin-top:18px;max-width:900px}
+.description span{display:block;font-size:clamp(16px,2.4vw,26px);line-height:1.5}
+.boton{margin-top:32px;padding:.9rem 2.2rem;border-radius:30px;border:none;cursor:pointer;font-size:clamp(16px,2.4vw,20px);font-weight:700;color:#0b132b;background:var(--gold);box-shadow:0 0 10px rgba(255,215,0,.5),0 0 25px rgba(255,215,0,.3);animation:pulse 1.8s infinite;transition:transform .2s ease,box-shadow .2s ease}
+.boton:hover{transform:scale(1.07)}
+@keyframes pulse{0%{box-shadow:0 0 5px var(--gold)}50%{box-shadow:0 0 20px var(--gold),0 0 40px rgba(255,215,0,.3)}100%{box-shadow:0 0 5px var(--gold)}}
+#wrapCanvas{display:flex;justify-content:center;align-items:center;padding:12px}
+canvas{max-width:min(98vw,960px);width:960px;height:620px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.flowerText{position:absolute;bottom:35px;left:20px;right:20px;font-size:clamp(15px,2.3vw,23px);font-weight:700;color:#FFD000;text-shadow:0 0 8px rgba(255,208,0,.8)}
+</style>
+</head>
+<body>
+
+<script>
+for(let i=0;i<40;i++){
+ const s=document.createElement('div');s.className='star';
+ const size=Math.random()*3+1;s.style.width=size+'px';s.style.height=size+'px';
+ s.style.top=Math.random()*100+'%';s.style.left=Math.random()*100+'%';
+ s.style.animationDuration=(1.5+Math.random()*2)+'s';
+ document.body.appendChild(s);
+}
+</script>
+
+<section id="intro" class="view show">
+ <div class="greetings"><span id="saludo"></span></div>
+ <div class="description"><span id="mensaje1"></span></div>
+ <div class="description"><span id="mensaje2"></span></div>
+ <button class="boton" id="verFlores" style="opacity:0;">HAZ CLICK AQUÍ</button>
+</section>
+
+<section id="flowersView" class="view hide">
+ <div id="wrapCanvas"><canvas id="c" width="960" height="620"></canvas></div>
+ <div id="flowerText" class="flowerText"></div>
+ <button class="boton" id="volver">VOLVER</button>
+</section>
+
+<script>
+function escribirTexto(elemento,texto,velocidad,callback){
+ let i=0;elemento.innerHTML='';
+ const cursor=document.createElement('span');cursor.className='cursor';elemento.appendChild(cursor);
+ function escribir(){
+  if(i<texto.length){
+   cursor.insertAdjacentText('beforebegin',texto.charAt(i));i++;
+   setTimeout(escribir,velocidad);
+  }else if(callback){callback();}
+ }
+ escribir();
+}
+
+const saludo=document.getElementById('saludo');
+const mensaje1=document.getElementById('mensaje1');
+const mensaje2=document.getElementById('mensaje2');
+const boton=document.getElementById('verFlores');
+
+setTimeout(()=>{
+ escribirTexto(saludo,"Hola Dany!",55,()=>{
+  setTimeout(()=>{
+   escribirTexto(mensaje1,"Este detalle es para ti, espero que te guste :)",18,()=>{
+    setTimeout(()=>{
+     escribirTexto(mensaje2,"Siempre que quieras, podrás regresar.",18,()=>{
+      setTimeout(()=>{boton.style.opacity=1},300);
+     });
+    },350);
+   });
+  },500);
+ });
+},400);
+
+const intro=document.getElementById('intro');
+const flowersView=document.getElementById('flowersView');
+
+boton.onclick=()=>{
+ intro.classList.add('hide');intro.classList.remove('show');
+ flowersView.classList.add('show');flowersView.classList.remove('hide');
+ startFlowers();
+};
+
+document.getElementById('volver').onclick=()=>{
+ flowersView.classList.add('hide');flowersView.classList.remove('show');
+ intro.classList.add('show');intro.classList.remove('hide');
+};
+
+let started=false;
+function startFlowers(){
+ if(started)return;started=true;
+ const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+ let flowers=[];
+ const rnd=(a,b)=>a+Math.random()*(b-a);
+ const DPR=()=>window.devicePixelRatio||1;
+
+ function setCanvasSize(){
+  const dpr=DPR(),cssW=Math.min(window.innerWidth*.98,960),cssH=Math.min(window.innerHeight*.68,620);
+  canvas.style.width=cssW+'px';canvas.style.height=cssH+'px';
+  canvas.width=Math.round(cssW*dpr);canvas.height=Math.round(cssH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+ }
+
+ class Flower{
+  constructor(x,y,r,petals){
+   this.x=x;this.y=y;this.r=r;this.petals=petals;this.phase=Math.random()*Math.PI*2;
+   this.h=rnd(140,220);this.leafAngle=rnd(.2,.6);this.rot=rnd(0,Math.PI*2);this.rotSpeed=rnd(-.002,.002);
+  }
+  drawStem(t){
+   const len=this.h,sway=Math.sin(t*.0015+this.phase)*20;
+   const x0=this.x,y0=this.y,x1=this.x+sway*.4,y1=this.y+len*.45,x2=this.x+sway,y2=this.y+len;
+   ctx.lineWidth=Math.max(2,this.r*.06);ctx.strokeStyle="#2E8B57";
+   ctx.beginPath();ctx.moveTo(x0,y0);ctx.quadraticCurveTo(x1,y1,x2,y2);ctx.stroke();
+   this.leaf(x0+(x1-x0)*.5,y0+(y1-y0)*.5,this.r*.55,1,t,1);
+   this.leaf(x0+(x1-x0)*.75,y0+(y1-y0)*.75,this.r*.48,-1,t,-1);
+  }
+  leaf(cx,cy,size,side,t,dir){
+   const a=this.leafAngle*side+Math.sin(t*.002+this.phase)*.08*dir;
+   ctx.save();ctx.translate(cx,cy);ctx.rotate(a);
+   const w=size*.25,h=size*.6,g=ctx.createLinearGradient(-w,0,w,0);
+   g.addColorStop(0,"#2E8B57");g.addColorStop(1,"#4CAF50");ctx.fillStyle=g;
+   ctx.beginPath();ctx.ellipse(0,0,w,h,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  petalsDraw(t){
+   ctx.save();ctx.translate(this.x,this.y);
+   const swayRot=Math.sin(t*.0015+this.phase)*.05;ctx.rotate(this.rot+swayRot);
+   for(let i=0;i<this.petals;i++){
+    ctx.save();ctx.rotate(i*(Math.PI*2/this.petals));
+    const pr=this.r,w=pr*.30,h=pr*1.05,grad=ctx.createLinearGradient(0,-h,0,h*.2);
+    grad.addColorStop(0,"#FFF3A0");grad.addColorStop(.45,"#FFD92F");grad.addColorStop(1,"#E5B800");
+    ctx.fillStyle=grad;ctx.shadowColor="rgba(255,208,0,.75)";ctx.shadowBlur=16+Math.sin(t*.004+this.phase)*4;
+    ctx.beginPath();ctx.ellipse(0,-pr*.25,w,h,0,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;ctx.lineWidth=pr*.02;ctx.strokeStyle="rgba(190,140,0,.25)";ctx.stroke();ctx.restore();
+   }
+   ctx.restore();
+  }
+  center(t){
+   ctx.save();ctx.translate(this.x,this.y);const rr=this.r*.32;
+   const g=ctx.createRadialGradient(0,0,rr*.2,0,0,rr);
+   g.addColorStop(0,"#FFB000");g.addColorStop(.7,"#FF9A00");g.addColorStop(1,"#C76A00");
+   ctx.fillStyle=g;ctx.shadowColor="rgba(255,180,0,.6)";ctx.shadowBlur=10+Math.sin(t*.004+this.phase)*3;
+   ctx.beginPath();ctx.arc(0,0,rr,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  draw(t){this.drawStem(t);this.petalsDraw(t);this.center(t);this.rot+=this.rotSpeed}
+ }
+
+ function placeFlowers(){
+  flowers=[];const W=canvas.clientWidth,H=canvas.clientHeight,N=W<420?3:4,base=Math.min(W,H)*.10;
+  let attempts=0;
+  while(flowers.length<N&&attempts<3000){
+   attempts++;
+   const f={x:rnd(W*.15,W*.85),y:rnd(H*.18,H*.42),r:rnd(base*.65,base*1.05),p:Math.floor(rnd(14,22))};
+   let ok=true;
+   for(const g of flowers){if(Math.hypot(f.x-g.x,f.y-g.y)<(f.r+g.r)*1.15){ok=false;break}}
+   if(ok)flowers.push(new Flower(f.x,f.y,f.r,f.p));
+  }
+ }
+
+ function drawBG(){
+  const W=canvas.clientWidth,H=canvas.clientHeight,g=ctx.createRadialGradient(W*.5,H*.45,80,W*.5,H*.5,W*.85);
+  g.addColorStop(0,"#0b132b");g.addColorStop(1,"#040816");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ }
+
+ const flowerText=document.getElementById('flowerText');let flowerMessageStarted=false;
+ function escribirMensajeFlores(){
+  if(flowerMessageStarted)return;flowerMessageStarted=true;
+  flowerText.innerHTML='';
+  escribirTexto(flowerText,"Estas flores amarillas son un reflejo de la alegría que traes a mi vida. Gracias por iluminar mis días con tu presencia.",22);
+ }
+
+ function loop(t){drawBG();flowers.forEach(f=>f.draw(t));requestAnimationFrame(loop)}
+ function relayout(){setCanvasSize();placeFlowers()}
+ relayout();requestAnimationFrame(loop);
+ setTimeout(escribirMensajeFlores,700);
+ window.addEventListener('resize',relayout);
+ window.addEventListener('orientationchange',()=>setTimeout(relayout,200));
+
+ canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+  const base=Math.min(canvas.clientWidth,canvas.clientHeight)*.10;
+  flowers.push(new Flower(x,y,rnd(base*.7,base*1.1),Math.floor(rnd(14,22))));
+ });
+}
+</script>
+</body>
+</html>
