@@ -23,10 +23,39 @@ body{margin:0;height:100vh;overflow:hidden;color:#fff;text-align:center;font-fam
 .boton{margin-top:32px;padding:.9rem 2.2rem;border-radius:30px;border:none;cursor:pointer;font-size:clamp(16px,2.4vw,20px);font-weight:700;color:#0b132b;background:var(--gold);box-shadow:0 0 10px rgba(255,215,0,.5),0 0 25px rgba(255,215,0,.3);animation:pulse 1.8s infinite;transition:transform .2s ease,box-shadow .2s ease}
 .boton:hover{transform:scale(1.07)}
 @keyframes pulse{0%{box-shadow:0 0 5px var(--gold)}50%{box-shadow:0 0 20px var(--gold),0 0 40px rgba(255,215,0,.3)}100%{box-shadow:0 0 5px var(--gold)}}
-#wrapCanvas{display:flex;justify-content:center;align-items:center;padding:12px}
-canvas{max-width:min(98vw,960px);width:960px;height:620px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
-.flowerText{position:absolute;bottom:35px;left:20px;right:20px;font-size:clamp(15px,2.3vw,23px);font-weight:700;color:#FFD000;text-shadow:0 0 8px rgba(255,208,0,.8)}
-</style>
+#wrapCanvas{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:12px;
+  width:100%;
+}
+
+canvas{
+  max-width:min(98vw,960px);
+  width:960px;
+  height:620px;
+  border-radius:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,.4);
+}
+
+.flowerText{
+  position:relative;
+  width:min(900px,90vw);
+  min-height:70px;
+  margin:10px auto 0;
+  font-size:clamp(15px,2.3vw,23px);
+  line-height:1.4;
+  font-weight:700;
+  color:#FFD000;
+  text-shadow:0 0 8px rgba(255,208,0,.8);
+}
+
+#volver{
+  margin-top:18px;
+  margin-bottom:10px;
+  flex-shrink:0;
+}</style>
 </head>
 <body>
 
@@ -108,8 +137,9 @@ function startFlowers(){
  const DPR=()=>window.devicePixelRatio||1;
 
  function setCanvasSize(){
-  const dpr=DPR(),cssW=Math.min(window.innerWidth*.98,960),cssH=Math.min(window.innerHeight*.68,620);
-  canvas.style.width=cssW+'px';canvas.style.height=cssH+'px';
+const dpr=DPR(),
+      cssW=Math.min(window.innerWidth*.98,960),
+      cssH=Math.min(window.innerHeight*.52,520);  canvas.style.width=cssW+'px';canvas.style.height=cssH+'px';
   canvas.width=Math.round(cssW*dpr);canvas.height=Math.round(cssH*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
  }
